@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELED
+}
+
+/// Akun admin. Pelanggan tidak punya akun.
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model Service {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  durationMinutes Int
+  /// Harga dalam rupiah utuh (tanpa desimal).
+  price           Int
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime  @updatedAt @db.Timestamptz(3)
+  bookings        Booking[]
+
+  @@index([isActive])
+}
+
+/// Catatan: tabel ini juga punya CHECK ("endAt" > "startAt") dan exclusion
+/// constraint "Booking_no_overlap" yang hanya didefinisikan di SQL migrasi,
+/// karena Prisma schema belum bisa merepresentasikannya.
+model Booking {
+  id                     String        @id @default(cuid())
+  /// Kode acak yang dipakai pelanggan untuk membuka halaman konfirmasi.
+  code                   String        @unique
+  serviceId              String
+  service                Service       @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  /// Snapshot layanan saat pesanan dibuat.
+  serviceName            String
+  servicePrice           Int
+  serviceDurationMinutes Int
+  customerName           String
+  customerWhatsapp       String?
+  customerEmail          String?
+  notes                  String?
+  status                 BookingStatus @default(PENDING)
+  /// Selalu disimpan sebagai UTC (timestamptz).
+  startAt                DateTime      @db.Timestamptz(3)
+  endAt                  DateTime      @db.Timestamptz(3)
+  createdAt              DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime      @updatedAt @db.Timestamptz(3)
+
+  @@index([startAt])
+  @@index([status])
+  @@index([serviceId])
+}
+
+/// Tepat 7 baris. dayOfWeek: 0 = Minggu ... 6 = Sabtu.
+model BusinessHours {
+  dayOfWeek Int      @id
+  /// Jam lokal bisnis, format "HH:mm".
+  openTime  String
+  closeTime String
+  isClosed  Boolean  @default(false)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model Holiday {
+  id          String   @id @default(cuid())
+  /// Tanggal kalender lokal bisnis (tanpa jam).
+  date        DateTime @unique @db.Date
+  description String?
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+}
