@@ -101,16 +101,18 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
       </Link>
 
       {/* Ringkasan layanan yang dipilih */}
-      <section className="bg-brand-gradient rounded-2xl p-6 text-white shadow-md">
-        <p className="text-xs font-medium tracking-wide text-white/80 uppercase">Layanan dipilih</p>
+      <section className="bg-card border-l-primary rounded-2xl border border-l-4 p-6 shadow-sm">
+        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">Layanan dipilih</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{service.name}</h1>
-        {service.description ? <p className="mt-1 text-sm text-white/85">{service.description}</p> : null}
+        {service.description ? (
+          <p className="text-muted-foreground mt-1 text-sm">{service.description}</p>
+        ) : null}
         <div className="mt-4 flex flex-wrap gap-2 text-sm font-medium">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1">
+          <span className="bg-accent text-accent-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1">
             <Clock className="size-4" aria-hidden="true" />
             {formatDuration(service.durationMinutes)}
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1">
+          <span className="bg-accent text-accent-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1">
             <Wallet className="size-4" aria-hidden="true" />
             {formatRupiah(service.price)}
           </span>

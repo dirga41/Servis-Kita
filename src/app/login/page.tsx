@@ -29,14 +29,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const callbackUrl = typeof params.callbackUrl === "string" ? params.callbackUrl : undefined;
 
   return (
-    <main className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-10">
-      <div
-        aria-hidden="true"
-        className="bg-brand-gradient absolute -top-40 left-1/2 size-[32rem] -translate-x-1/2 rounded-full opacity-20 blur-3xl"
-      />
-      <div className="relative w-full max-w-sm space-y-6">
+    <main className="flex min-h-dvh items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center gap-3 text-center">
-          <BrandMark className="size-12 rounded-xl [&>svg]:size-6" />
+          <BrandMark className="size-12" />
           <p className="font-semibold tracking-tight">{env.BUSINESS_NAME}</p>
         </div>
         <Card className="shadow-lg">

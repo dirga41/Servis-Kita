@@ -40,78 +40,72 @@
   --animate-pop-out: pop-out 150ms ease-in;
 }
 
-/* Tema terang (default). */
+/* Palet: hijau teal tua sebagai warna utama, mint sebagai pendamping,
+   abu hangat sebagai dasar. Warna status: kuning (menunggu), hijau teal
+   (dikonfirmasi), hijau zamrud (selesai), merah (dibatalkan). */
 :root {
   /* Memberi tahu browser bahwa kedua tema didukung, sehingga kontrol bawaan
      (date picker, scrollbar) ikut menyesuaikan. */
   color-scheme: light dark;
+  /* Warna pilihan/sorotan pada kontrol bawaan browser, mis. kalender input tanggal. */
+  accent-color: var(--primary);
 
   --radius: 0.75rem;
 
-  --background: oklch(0.985 0.004 275);
-  --foreground: oklch(0.21 0.03 275);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.03 275);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.03 275);
-  --primary: oklch(0.51 0.21 277);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.95 0.015 275);
-  --secondary-foreground: oklch(0.28 0.05 275);
-  --muted: oklch(0.96 0.008 275);
-  --muted-foreground: oklch(0.5 0.03 275);
-  --accent: oklch(0.94 0.035 277);
-  --accent-foreground: oklch(0.36 0.14 277);
-  --destructive: oklch(0.56 0.21 25);
-  --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.55 0.14 155);
-  --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.8 0.15 80);
-  --warning-foreground: oklch(0.28 0.06 70);
-  --border: oklch(0.91 0.012 275);
-  --input: oklch(0.88 0.015 275);
-  --ring: oklch(0.62 0.17 277);
-
-  /* Gradien merek untuk hero dan logo. Teks di atasnya selalu putih. */
-  --brand-from: oklch(0.5 0.22 277);
-  --brand-to: oklch(0.56 0.22 320);
+  --background: #f1f3f5;
+  --foreground: #333333;
+  --card: #ffffff;
+  --card-foreground: #333333;
+  --popover: #ffffff;
+  --popover-foreground: #333333;
+  --primary: #2d6a4f;
+  --primary-foreground: #ffffff;
+  --secondary: #81b29a;
+  --secondary-foreground: #17382b;
+  --muted: #e9ecef;
+  --muted-foreground: #6c757d;
+  --accent: #dcebe3;
+  --accent-foreground: #2d6a4f;
+  --destructive: #e63946;
+  --destructive-foreground: #ffffff;
+  --success: #52b788;
+  --success-foreground: #0f3d2a;
+  --warning: #e9c46a;
+  --warning-foreground: #4a3b0e;
+  --border: #dee2e6;
+  --input: #ced4da;
+  --ring: #52b788;
 }
 
 /* Tema gelap: otomatis mengikuti pengaturan browser / sistem operasi
-   pengunjung (pelanggan maupun admin), tanpa JavaScript. */
+   pengunjung (pelanggan maupun admin), tanpa JavaScript. Palet yang sama,
+   dengan hijau yang dicerahkan supaya tetap terbaca di latar gelap. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: oklch(0.16 0.02 275);
-    --foreground: oklch(0.95 0.008 275);
-    --card: oklch(0.21 0.025 275);
-    --card-foreground: oklch(0.95 0.008 275);
-    --popover: oklch(0.21 0.025 275);
-    --popover-foreground: oklch(0.95 0.008 275);
-    --primary: oklch(0.7 0.16 277);
-    --primary-foreground: oklch(0.16 0.03 277);
-    --secondary: oklch(0.27 0.03 275);
-    --secondary-foreground: oklch(0.95 0.008 275);
-    --muted: oklch(0.25 0.025 275);
-    --muted-foreground: oklch(0.72 0.025 275);
-    --accent: oklch(0.3 0.06 277);
-    --accent-foreground: oklch(0.9 0.05 277);
-    --destructive: oklch(0.68 0.19 25);
-    --destructive-foreground: oklch(0.16 0.03 25);
-    --success: oklch(0.74 0.15 155);
-    --success-foreground: oklch(0.17 0.04 155);
-    --warning: oklch(0.8 0.14 80);
-    --warning-foreground: oklch(0.22 0.05 70);
-    --border: oklch(0.32 0.025 275);
-    --input: oklch(0.36 0.03 275);
-    --ring: oklch(0.7 0.16 277);
-
-    --brand-from: oklch(0.42 0.19 277);
-    --brand-to: oklch(0.45 0.19 320);
+    --background: #121815;
+    --foreground: #e8ecea;
+    --card: #1a221e;
+    --card-foreground: #e8ecea;
+    --popover: #1a221e;
+    --popover-foreground: #e8ecea;
+    --primary: #4fa67c;
+    --primary-foreground: #08170f;
+    --secondary: #2e4a3e;
+    --secondary-foreground: #d8efe3;
+    --muted: #212b26;
+    --muted-foreground: #9aa7a0;
+    --accent: #223b30;
+    --accent-foreground: #bfe3d0;
+    --destructive: #ef6b75;
+    --destructive-foreground: #2a0a0d;
+    --success: #8fd9b0;
+    --success-foreground: #0b2a1b;
+    --warning: #e9c46a;
+    --warning-foreground: #3a2e08;
+    --border: #2c3832;
+    --input: #37453e;
+    --ring: #52b788;
   }
-}
-
-@utility bg-brand-gradient {
-  background-image: linear-gradient(135deg, var(--brand-from), var(--brand-to));
 }
 
 @keyframes fade-in {

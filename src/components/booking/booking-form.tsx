@@ -117,10 +117,10 @@ export function BookingForm({ serviceId, dateLabel, slots, unavailableMessage }:
                     aria-pressed={isSelected}
                     onClick={() => setValue("startAt", slot.startAt, { shouldValidate: true })}
                     className={cn(
-                      "focus-visible:ring-ring/50 h-11 rounded-lg border text-sm font-semibold tabular-nums transition-colors outline-none focus-visible:ring-[3px] disabled:opacity-50",
+                      "focus-visible:ring-ring/50 h-11 rounded-lg border text-sm font-semibold tabular-nums transition-all duration-200 ease-in-out outline-none focus-visible:ring-[3px] disabled:opacity-50",
                       isSelected
                         ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                        : "bg-background hover:border-primary/50 hover:bg-accent hover:text-accent-foreground",
+                        : "bg-card hover:border-primary/50 hover:bg-accent hover:text-accent-foreground hover:-translate-y-0.5",
                     )}
                   >
                     {slot.label}

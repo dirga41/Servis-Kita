@@ -107,9 +107,9 @@ function toHtml(content: MessageContent): string {
     .map((line) => `<p style="margin:0 0 10px">${escapeHtml(line)}</p>`)
     .join("");
   return [
-    '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#1f2433;max-width:520px">',
+    '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#333333;max-width:520px">',
     paragraphs,
-    `<p style="margin:18px 0 0"><a href="${escapeHtml(content.linkUrl)}" style="display:inline-block;background:#4f46e5;color:#ffffff;text-decoration:none;padding:10px 18px;border-radius:8px">${escapeHtml(content.linkLabel)}</a></p>`,
+    `<p style="margin:18px 0 0"><a href="${escapeHtml(content.linkUrl)}" style="display:inline-block;background:#2d6a4f;color:#ffffff;text-decoration:none;padding:10px 18px;border-radius:8px">${escapeHtml(content.linkLabel)}</a></p>`,
     "</div>",
   ].join("");
 }

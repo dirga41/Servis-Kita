@@ -14,6 +14,14 @@ const ACTION_LABELS: Record<BookingStatusValue, string> = {
   CANCELED: "Batalkan",
 };
 
+/** Warna tombol mengikuti status tujuannya. */
+const ACTION_CLASSES: Record<BookingStatusValue, string> = {
+  PENDING: "",
+  CONFIRMED: "",
+  COMPLETED: "bg-success text-success-foreground hover:bg-success/85",
+  CANCELED: "border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive",
+};
+
 type Feedback = { tone: "info" | "error"; text: string };
 
 function describeNotifications(outcome: NotificationOutcome): Feedback | null {
@@ -75,6 +83,7 @@ export function StatusActions({ bookingId, status, customerName }: StatusActions
               key={nextStatus}
               size="sm"
               variant={nextStatus === "CANCELED" ? "outline" : "default"}
+              className={ACTION_CLASSES[nextStatus]}
               disabled={isPending}
               onClick={() => changeStatus(nextStatus)}
             >

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BellRing, CalendarClock, Clock, ListChecks, Sparkles } from "lucide-react";
+import { ArrowRight, BellRing, CalendarClock, Clock, ListChecks } from "lucide-react";
 
 import { BookingLookup } from "@/components/booking/booking-lookup";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { env } from "@/lib/env";
 import { formatDuration, formatRupiah } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
+import { dayOfWeekFromDateKey, formatDateKeyLong, todayDateKey } from "@/lib/time";
 
 // Membaca database: jangan di-prerender saat build.
 export const dynamic = "force-dynamic";
@@ -15,66 +16,79 @@ const STEPS = [
   {
     icon: ListChecks,
     title: "Pilih layanan",
-    description: "Lihat durasi dan harga, lalu pilih layanan yang Anda butuhkan.",
+    description: "Durasi dan harganya sudah tertulis, jadi tidak ada kejutan di kasir.",
   },
   {
     icon: CalendarClock,
     title: "Pilih tanggal dan jam",
-    description: "Hanya jam yang masih kosong yang ditampilkan, jadi tidak perlu tanya dulu.",
+    description: "Yang muncul hanya jam yang benar-benar masih kosong.",
   },
   {
     icon: BellRing,
-    title: "Tunggu konfirmasi",
-    description: "Anda mendapat kode booking untuk memantau status pesanan kapan saja.",
+    title: "Simpan kode booking",
+    description: "Pakai kodenya untuk mengecek apakah pesanan sudah dikonfirmasi.",
   },
 ];
 
 export default async function CatalogPage() {
-  const services = await prisma.service.findMany({
-    where: { isActive: true },
-    orderBy: [{ createdAt: "asc" }, { name: "asc" }],
-  });
+  const todayKey = todayDateKey(env.BUSINESS_TIMEZONE);
+
+  const [services, todayHours] = await Promise.all([
+    prisma.service.findMany({
+      where: { isActive: true },
+      orderBy: [{ createdAt: "asc" }, { name: "asc" }],
+    }),
+    prisma.businessHours.findUnique({ where: { dayOfWeek: dayOfWeekFromDateKey(todayKey) } }),
+  ]);
+
+  const isOpenToday = Boolean(todayHours && !todayHours.isClosed);
 
   return (
     <div className="space-y-14">
-      {/* Hero */}
-      <section className="bg-brand-gradient relative overflow-hidden rounded-2xl px-6 py-12 text-white shadow-lg sm:px-12 sm:py-16">
-        <div
-          aria-hidden="true"
-          className="absolute -top-24 -right-16 size-72 rounded-full bg-white/15 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute -bottom-28 left-1/3 size-72 rounded-full bg-white/10 blur-3xl"
-        />
-        <div className="relative max-w-2xl space-y-5">
-          <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-medium">
-            <Sparkles className="size-3.5" aria-hidden="true" />
-            Booking online, tanpa perlu membuat akun
+      {/* Hero: latar putih bersih, tanpa gradien. */}
+      <section className="bg-card grid gap-8 rounded-2xl border p-6 shadow-sm sm:p-10 lg:grid-cols-[1.5fr_1fr] lg:items-center">
+        <div className="space-y-5">
+          <p className="bg-accent text-accent-foreground inline-flex rounded-full px-3 py-1 text-xs font-medium">
+            Booking online · tanpa perlu membuat akun
           </p>
           <h1 className="text-3xl leading-tight font-bold tracking-tight sm:text-5xl">
-            Pesan jadwal di {env.BUSINESS_NAME} tanpa antre
+            Pilih jamnya, tinggal datang.
           </h1>
-          <p className="max-w-xl text-base text-white/85 sm:text-lg">
-            Pilih layanan, tentukan jam yang masih kosong, dan datang sesuai jadwal. Cukup dari
-            ponsel Anda.
+          <p className="text-muted-foreground max-w-xl text-base sm:text-lg">
+            Lihat jam yang masih kosong di {env.BUSINESS_NAME}, pesan dari ponsel, lalu pantau statusnya
+            lewat kode booking.
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
-            <Button asChild size="lg" className="bg-white text-neutral-900 hover:bg-white/90">
+            <Button asChild size="lg">
               <Link href="#layanan">
                 Lihat layanan
                 <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
-            >
+            <Button asChild size="lg" variant="outline">
               <Link href="#cek-pesanan">Cek pesanan saya</Link>
             </Button>
           </div>
+        </div>
+
+        {/* Info nyata dari database: jam buka hari ini. */}
+        <div className="bg-background rounded-xl border p-5">
+          <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">Hari ini</p>
+          <p className="mt-1 text-sm font-medium">{formatDateKeyLong(todayKey)}</p>
+          <div className="mt-4 flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className={isOpenToday ? "bg-success size-2.5 rounded-full" : "bg-destructive size-2.5 rounded-full"}
+            />
+            <p className="text-2xl font-bold tracking-tight tabular-nums">
+              {todayHours && !todayHours.isClosed ? `${todayHours.openTime} - ${todayHours.closeTime}` : "Tutup"}
+            </p>
+          </div>
+          <p className="text-muted-foreground mt-2 text-sm">
+            {isOpenToday
+              ? "Jam yang masih bisa dipesan terlihat setelah memilih layanan."
+              : "Hari ini kami tutup, tapi jadwal hari lain tetap bisa dipesan."}
+          </p>
         </div>
       </section>
 
@@ -84,16 +98,16 @@ export default async function CatalogPage() {
           <h2 id="cara-pesan-title" className="text-2xl font-bold tracking-tight">
             Cara pesan
           </h2>
-          <p className="text-muted-foreground text-sm">Tiga langkah, selesai dari ponsel Anda.</p>
+          <p className="text-muted-foreground text-sm">Tiga langkah, cukup dari ponsel.</p>
         </div>
         <ol className="grid gap-4 sm:grid-cols-3">
           {STEPS.map((step, index) => (
-            <li key={step.title} className="bg-card relative rounded-xl border p-5 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <span className="bg-accent text-accent-foreground inline-flex size-10 items-center justify-center rounded-lg">
-                  <step.icon className="size-5" aria-hidden="true" />
+            <li key={step.title} className="bg-card rounded-xl border p-5">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="bg-primary text-primary-foreground inline-flex size-8 items-center justify-center rounded-full text-sm font-semibold tabular-nums">
+                  {index + 1}
                 </span>
-                <span className="text-muted-foreground/40 text-3xl font-bold tabular-nums">{index + 1}</span>
+                <step.icon className="text-muted-foreground size-5" aria-hidden="true" />
               </div>
               <h3 className="font-semibold">{step.title}</h3>
               <p className="text-muted-foreground mt-1 text-sm">{step.description}</p>
@@ -122,7 +136,7 @@ export default async function CatalogPage() {
             {services.map((service) => (
               <Card
                 key={service.id}
-                className="hover:border-primary/50 justify-between transition-shadow hover:shadow-md"
+                className="hover:border-primary/50 justify-between transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
@@ -157,7 +171,7 @@ export default async function CatalogPage() {
               Sudah pesan? Cek statusnya
             </CardTitle>
             <CardDescription>
-              Masukkan kode booking yang Anda terima setelah memesan untuk melihat apakah pesanan sudah
+              Masukkan kode booking yang muncul setelah memesan untuk melihat apakah jadwal Anda sudah
               dikonfirmasi.
             </CardDescription>
           </CardHeader>

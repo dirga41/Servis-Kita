@@ -20,6 +20,8 @@ type SeedService = {
   id: string;
   name: string;
   description: string;
+  /** Deskripsi bawaan versi lama; dipakai untuk memperbarui teks yang belum diubah admin. */
+  previousDescription: string;
   durationMinutes: number;
   price: number;
 };
@@ -28,28 +30,36 @@ const SERVICES: SeedService[] = [
   {
     id: "seed-potong-rambut",
     name: "Potong Rambut",
-    description: "Potong rambut sesuai model pilihan, termasuk cuci dan styling ringan.",
+    description:
+      "Ngobrol dulu soal model yang dimau, baru gunting jalan. Sudah termasuk cuci dan ditata, jadi pulang dari sini langsung rapi.",
+    previousDescription: "Potong rambut sesuai model pilihan, termasuk cuci dan styling ringan.",
     durationMinutes: 45,
     price: 50000,
   },
   {
     id: "seed-cukur-jenggot",
     name: "Cukur & Rapikan Jenggot",
-    description: "Cukur bersih atau rapikan bentuk jenggot dan kumis.",
+    description:
+      "Jenggot dan kumis dibentuk mengikuti garis wajah, dibantu handuk hangat supaya kulit tidak perih. Pas untuk tampil rapi tanpa harus cukur habis.",
+    previousDescription: "Cukur bersih atau rapikan bentuk jenggot dan kumis.",
     durationMinutes: 30,
     price: 30000,
   },
   {
     id: "seed-creambath",
     name: "Creambath",
-    description: "Perawatan rambut dengan krim dan pijat kepala.",
+    description:
+      "Satu jam untuk istirahat: rambut dirawat dengan krim, kepala sampai pundak dipijat pelan. Enak dipesan setelah minggu yang panjang.",
+    previousDescription: "Perawatan rambut dengan krim dan pijat kepala.",
     durationMinutes: 60,
     price: 85000,
   },
   {
     id: "seed-paket-lengkap",
     name: "Paket Lengkap",
-    description: "Potong rambut, cukur jenggot, dan creambath dalam satu sesi.",
+    description:
+      "Potong rambut, rapikan jenggot, lalu ditutup creambath dalam satu kunjungan. Lebih hemat daripada pesan satu per satu, dan tidak perlu bolak-balik.",
+    previousDescription: "Potong rambut, cukur jenggot, dan creambath dalam satu sesi.",
     durationMinutes: 120,
     price: 150000,
   },
@@ -100,10 +110,17 @@ async function main(): Promise<void> {
   // Layanan contoh: hanya dibuat jika belum ada, agar perubahan dari dasbor
   // admin tidak tertimpa saat seed dijalankan ulang.
   for (const service of SERVICES) {
+    const { previousDescription, ...data } = service;
     await prisma.service.upsert({
-      where: { id: service.id },
+      where: { id: data.id },
       update: {},
-      create: service,
+      create: data,
+    });
+    // Perbarui deskripsi HANYA jika masih sama persis dengan teks bawaan lama,
+    // supaya deskripsi yang sudah ditulis ulang admin tidak ikut berubah.
+    await prisma.service.updateMany({
+      where: { id: data.id, description: previousDescription },
+      data: { description: data.description },
     });
   }
   console.log(`Layanan contoh siap: ${SERVICES.length} layanan`);

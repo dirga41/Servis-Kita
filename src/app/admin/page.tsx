@@ -34,9 +34,9 @@ const PENDING_LIST_LIMIT = 50;
 
 const STATUS_TILES: Record<BookingStatusValue, { icon: typeof Hourglass; iconClass: string }> = {
   PENDING: { icon: Hourglass, iconClass: "bg-warning text-warning-foreground" },
-  CONFIRMED: { icon: CircleCheck, iconClass: "bg-primary/15 text-primary" },
-  COMPLETED: { icon: BadgeCheck, iconClass: "bg-success/15 text-success" },
-  CANCELED: { icon: CircleX, iconClass: "bg-destructive/15 text-destructive" },
+  CONFIRMED: { icon: CircleCheck, iconClass: "bg-primary text-primary-foreground" },
+  COMPLETED: { icon: BadgeCheck, iconClass: "bg-success text-success-foreground" },
+  CANCELED: { icon: CircleX, iconClass: "bg-destructive text-destructive-foreground" },
 };
 
 type AdminDashboardPageProps = {
@@ -94,7 +94,10 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
         {BOOKING_STATUSES.map((status, index) => {
           const tile = STATUS_TILES[status];
           return (
-            <Card key={status} className="gap-3">
+            <Card
+              key={status}
+              className="gap-3 transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+            >
               <CardContent className="flex items-center gap-3">
                 <span
                   className={cn(

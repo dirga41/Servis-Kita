@@ -53,8 +53,3 @@ npm run dev
 | `FONNTE_TOKEN` | Opsional | Untuk notifikasi WhatsApp |
 | `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | Wajib untuk seed | Akun admin |
 
-## Deploy ke Vercel
-
-1. Push repo ke GitHub, lalu import di Vercel.
-2. Isi environment variable di atas (tanpa `SEED_*`).
-3. Set Build Command ke `npm run vercel-build`, lalu deploy.

@@ -28,7 +28,7 @@ export function DatePicker({ basePath, selectedDateKey, minDateKey, maxDateKey, 
 
   return (
     <div className="space-y-4">
-      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pt-1 pb-2">
         {quickDates.map((quickDate) => {
           const isSelected = quickDate.dateKey === selectedDateKey;
           return (
@@ -38,10 +38,10 @@ export function DatePicker({ basePath, selectedDateKey, minDateKey, maxDateKey, 
               scroll={false}
               aria-current={isSelected ? "date" : undefined}
               className={cn(
-                "focus-visible:ring-ring/50 flex min-w-[4.5rem] shrink-0 flex-col items-center gap-0.5 rounded-xl border px-3 py-2.5 text-center transition-colors outline-none focus-visible:ring-[3px]",
+                "focus-visible:ring-ring/50 flex min-w-[4.5rem] shrink-0 flex-col items-center gap-0.5 rounded-xl border px-3 py-2.5 text-center transition-all duration-200 ease-in-out outline-none focus-visible:ring-[3px]",
                 isSelected
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                  : "bg-background hover:border-primary/50 hover:bg-accent hover:text-accent-foreground",
+                  : "bg-card hover:border-primary/50 hover:bg-accent hover:text-accent-foreground hover:-translate-y-0.5",
               )}
             >
               <span className={cn("text-xs", isSelected ? "opacity-90" : "text-muted-foreground")}>
