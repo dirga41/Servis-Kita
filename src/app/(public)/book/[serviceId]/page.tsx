@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft, Clock, Wallet } from "lucide-react";
 
 import { BookingForm } from "@/components/booking/booking-form";
-import { DatePicker } from "@/components/booking/date-picker";
+import { DatePicker, type QuickDate } from "@/components/booking/date-picker";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { env } from "@/lib/env";
 import { formatDuration, formatRupiah } from "@/lib/format";
@@ -43,6 +44,24 @@ function unavailableMessage(availability: DayAvailability): string | null {
   }
 }
 
+function toQuickDate(dateKey: string, index: number): QuickDate {
+  // formatDateKeyShort menghasilkan "Sab, 3 Okt".
+  const [weekday, day] = formatDateKeyShort(dateKey).split(", ");
+  return {
+    dateKey,
+    weekday: index === 0 ? "Hari ini" : (weekday ?? ""),
+    day: day ?? dateKey,
+  };
+}
+
+function StepBadge({ number }: { number: number }) {
+  return (
+    <span className="bg-primary text-primary-foreground inline-flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
+      {number}
+    </span>
+  );
+}
+
 export default async function BookPage({ params, searchParams }: BookPageProps) {
   const { serviceId } = await params;
   const query = await searchParams;
@@ -67,26 +86,43 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
     durationMinutes: service.durationMinutes,
   });
 
-  const quickDates = Array.from({ length: QUICK_DATE_COUNT }, (_, index) => {
-    const key = addDaysToDateKey(minDateKey, index);
-    return { dateKey: key, label: formatDateKeyShort(key) };
-  });
+  const quickDates = Array.from({ length: QUICK_DATE_COUNT }, (_, index) =>
+    toQuickDate(addDaysToDateKey(minDateKey, index), index),
+  );
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <Link href="/" className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4">
-          Semua layanan
-        </Link>
-        <h1 className="text-2xl font-semibold">{service.name}</h1>
-        <p className="text-muted-foreground text-sm">
-          {formatDuration(service.durationMinutes)} · {formatRupiah(service.price)}
-        </p>
-      </div>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <Link
+        href="/#layanan"
+        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm"
+      >
+        <ArrowLeft className="size-4" aria-hidden="true" />
+        Ganti layanan
+      </Link>
+
+      {/* Ringkasan layanan yang dipilih */}
+      <section className="bg-brand-gradient rounded-2xl p-6 text-white shadow-md">
+        <p className="text-xs font-medium tracking-wide text-white/80 uppercase">Layanan dipilih</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{service.name}</h1>
+        {service.description ? <p className="mt-1 text-sm text-white/85">{service.description}</p> : null}
+        <div className="mt-4 flex flex-wrap gap-2 text-sm font-medium">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1">
+            <Clock className="size-4" aria-hidden="true" />
+            {formatDuration(service.durationMinutes)}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1">
+            <Wallet className="size-4" aria-hidden="true" />
+            {formatRupiah(service.price)}
+          </span>
+        </div>
+      </section>
 
       <Card>
         <CardHeader>
-          <CardTitle>1. Pilih tanggal</CardTitle>
+          <CardTitle className="flex items-center gap-2.5 text-lg">
+            <StepBadge number={1} />
+            Pilih tanggal
+          </CardTitle>
           <CardDescription>Pemesanan dibuka sampai {formatDateKeyLong(maxDateKey)}.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -102,7 +138,10 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
 
       <Card>
         <CardHeader>
-          <CardTitle>2. Pilih jam dan isi data</CardTitle>
+          <CardTitle className="flex items-center gap-2.5 text-lg">
+            <StepBadge number={2} />
+            Pilih jam dan isi data
+          </CardTitle>
           <CardDescription>
             {formatDateKeyLong(dateKey)} · zona waktu {env.BUSINESS_TIMEZONE}
           </CardDescription>
@@ -111,6 +150,7 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
           <BookingForm
             key={dateKey}
             serviceId={service.id}
+            dateLabel={formatDateKeyLong(dateKey)}
             slots={availability.slots}
             unavailableMessage={unavailableMessage(availability)}
           />

@@ -25,6 +25,16 @@ model User {
   updatedAt    DateTime @updatedAt @db.Timestamptz(3)
 }
 
+/// Percobaan login yang gagal, untuk membatasi brute force.
+/// key = "ip:<alamat>" atau "email:<alamat>".
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([key, createdAt])
+}
+
 model Service {
   id              String    @id @default(cuid())
   name            String

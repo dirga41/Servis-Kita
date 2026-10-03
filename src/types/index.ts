@@ -12,6 +12,16 @@ export type Slot = {
   endAt: string;
   /** Jam mulai dalam zona waktu bisnis, mis. "09:30". */
   label: string;
+  /** Jam selesai dalam zona waktu bisnis, mis. "10:15". */
+  endLabel: string;
+};
+
+export type NotificationChannelResult = "sent" | "failed" | "skipped";
+
+/** Hasil pengiriman notifikasi ke pelanggan saat status pesanan berubah. */
+export type NotificationOutcome = {
+  email: NotificationChannelResult;
+  whatsapp: NotificationChannelResult;
 };
 
 export type DayAvailabilityStatus = "OPEN" | "FULL" | "CLOSED" | "HOLIDAY" | "OUT_OF_RANGE";

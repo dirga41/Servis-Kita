@@ -52,6 +52,7 @@ export function computeAvailableSlots(input: SlotComputationInput): Slot[] {
       startAt: start.toISOString(),
       endAt: new Date(endMs).toISOString(),
       label,
+      endLabel: minutesToTime(minute + durationMinutes),
     });
   }
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/components/auth/login-form";
+import { BrandMark } from "@/components/site/brand-mark";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentAdmin } from "@/lib/auth-guard";
 import { env } from "@/lib/env";
@@ -12,6 +13,8 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Masuk Admin",
+  // Halaman login tidak ditautkan dari situs publik dan tidak perlu diindeks.
+  robots: { index: false, follow: false },
 };
 
 type LoginPageProps = {
@@ -26,12 +29,20 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const callbackUrl = typeof params.callbackUrl === "string" ? params.callbackUrl : undefined;
 
   return (
-    <main className="flex min-h-dvh items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm space-y-4">
-        <Card>
+    <main className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-10">
+      <div
+        aria-hidden="true"
+        className="bg-brand-gradient absolute -top-40 left-1/2 size-[32rem] -translate-x-1/2 rounded-full opacity-20 blur-3xl"
+      />
+      <div className="relative w-full max-w-sm space-y-6">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <BrandMark className="size-12 rounded-xl [&>svg]:size-6" />
+          <p className="font-semibold tracking-tight">{env.BUSINESS_NAME}</p>
+        </div>
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-xl">Masuk Admin</CardTitle>
-            <CardDescription>Kelola pesanan dan jadwal {env.BUSINESS_NAME}.</CardDescription>
+            <CardDescription>Kelola pesanan, layanan, dan jadwal.</CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm callbackUrl={callbackUrl} />

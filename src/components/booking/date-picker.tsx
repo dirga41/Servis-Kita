@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-type QuickDate = { dateKey: string; label: string };
+export type QuickDate = {
+  dateKey: string;
+  /** Mis. "Sab" atau "Hari ini". */
+  weekday: string;
+  /** Mis. "3 Okt". */
+  day: string;
+};
 
 type DatePickerProps = {
   basePath: string;
@@ -23,7 +28,7 @@ export function DatePicker({ basePath, selectedDateKey, minDateKey, maxDateKey, 
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
         {quickDates.map((quickDate) => {
           const isSelected = quickDate.dateKey === selectedDateKey;
           return (
@@ -32,16 +37,26 @@ export function DatePicker({ basePath, selectedDateKey, minDateKey, maxDateKey, 
               href={`${basePath}?date=${quickDate.dateKey}`}
               scroll={false}
               aria-current={isSelected ? "date" : undefined}
-              className={cn(buttonVariants({ variant: isSelected ? "default" : "outline", size: "sm" }), "shrink-0")}
+              className={cn(
+                "focus-visible:ring-ring/50 flex min-w-[4.5rem] shrink-0 flex-col items-center gap-0.5 rounded-xl border px-3 py-2.5 text-center transition-colors outline-none focus-visible:ring-[3px]",
+                isSelected
+                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                  : "bg-background hover:border-primary/50 hover:bg-accent hover:text-accent-foreground",
+              )}
             >
-              {quickDate.label}
+              <span className={cn("text-xs", isSelected ? "opacity-90" : "text-muted-foreground")}>
+                {quickDate.weekday}
+              </span>
+              <span className="text-sm font-semibold whitespace-nowrap">{quickDate.day}</span>
             </Link>
           );
         })}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Label htmlFor="booking-date">Tanggal lain</Label>
+        <Label htmlFor="booking-date" className="text-muted-foreground font-normal">
+          Atau pilih tanggal lain
+        </Label>
         <Input
           id="booking-date"
           type="date"

@@ -1,6 +1,7 @@
 import type { Booking } from "@prisma/client";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BadgeCheck, CircleCheck, CircleX, Hourglass } from "lucide-react";
 
 import { BookingTable, type BookingRow } from "@/components/admin/booking-table";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { requireAdminPage } from "@/lib/auth-guard";
-import { BOOKING_STATUS_LABELS, BOOKING_STATUSES } from "@/lib/constants";
+import { BOOKING_STATUS_LABELS, BOOKING_STATUSES, type BookingStatusValue } from "@/lib/constants";
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import {
@@ -20,6 +21,7 @@ import {
   isValidDateKey,
   todayDateKey,
 } from "@/lib/time";
+import { cn } from "@/lib/utils";
 
 // Membaca database: jangan di-prerender saat build.
 export const dynamic = "force-dynamic";
@@ -29,6 +31,13 @@ export const metadata: Metadata = {
 };
 
 const PENDING_LIST_LIMIT = 50;
+
+const STATUS_TILES: Record<BookingStatusValue, { icon: typeof Hourglass; iconClass: string }> = {
+  PENDING: { icon: Hourglass, iconClass: "bg-warning text-warning-foreground" },
+  CONFIRMED: { icon: CircleCheck, iconClass: "bg-primary/15 text-primary" },
+  COMPLETED: { icon: BadgeCheck, iconClass: "bg-success/15 text-success" },
+  CANCELED: { icon: CircleX, iconClass: "bg-destructive/15 text-destructive" },
+};
 
 type AdminDashboardPageProps = {
   searchParams: Promise<{ date?: string | string[] }>;
@@ -77,21 +86,32 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
   return (
     <div className="space-y-8">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">Dasbor</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Dasbor</h1>
         <p className="text-muted-foreground text-sm">Semua jam ditampilkan dalam zona waktu {timeZone}.</p>
       </div>
 
       <section aria-label="Jumlah pesanan per status" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {BOOKING_STATUSES.map((status, index) => (
-          <Card key={status} className="gap-2">
-            <CardHeader>
-              <CardDescription>{BOOKING_STATUS_LABELS[status]}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-semibold tabular-nums">{statusCounts[index]}</p>
-            </CardContent>
-          </Card>
-        ))}
+        {BOOKING_STATUSES.map((status, index) => {
+          const tile = STATUS_TILES[status];
+          return (
+            <Card key={status} className="gap-3">
+              <CardContent className="flex items-center gap-3">
+                <span
+                  className={cn(
+                    "inline-flex size-10 shrink-0 items-center justify-center rounded-lg",
+                    tile.iconClass,
+                  )}
+                >
+                  <tile.icon className="size-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-2xl leading-none font-bold tabular-nums">{statusCounts[index]}</p>
+                  <p className="text-muted-foreground mt-1 truncate text-xs">{BOOKING_STATUS_LABELS[status]}</p>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </section>
 
       <Card>

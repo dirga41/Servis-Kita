@@ -20,6 +20,8 @@ const postgresUrl = (name: string) =>
     .string({ required_error: `${name} wajib diisi.` })
     .regex(/^postgres(ql)?:\/\//, `${name} harus diawali "postgresql://".`);
 
+const optionalText = z.preprocess(emptyToUndefined, z.string().trim().min(1).optional());
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: postgresUrl("DATABASE_URL"),
@@ -35,6 +37,18 @@ const envSchema = z.object({
       .default("Asia/Jakarta"),
   ),
   BUSINESS_NAME: z.preprocess(emptyToUndefined, z.string().trim().min(1).max(60).default("Servis Kita")),
+
+  // --- Opsional: notifikasi ke pelanggan (lihat src/lib/notifications.ts) ---
+  APP_URL: z.preprocess(
+    emptyToUndefined,
+    z.string().url("APP_URL harus URL lengkap, mis. https://servis-kita.vercel.app.").optional(),
+  ),
+  // Diisi otomatis oleh Vercel; dipakai sebagai cadangan bila APP_URL kosong.
+  VERCEL_PROJECT_PRODUCTION_URL: optionalText,
+  EMAIL_FROM: optionalText,
+  RESEND_API_KEY: optionalText,
+  BREVO_API_KEY: optionalText,
+  FONNTE_TOKEN: optionalText,
 });
 
 const parsed = envSchema.safeParse({
@@ -44,6 +58,12 @@ const parsed = envSchema.safeParse({
   AUTH_SECRET: process.env.AUTH_SECRET,
   BUSINESS_TIMEZONE: process.env.BUSINESS_TIMEZONE,
   BUSINESS_NAME: process.env.BUSINESS_NAME,
+  APP_URL: process.env.APP_URL,
+  VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+  EMAIL_FROM: process.env.EMAIL_FROM,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
+  BREVO_API_KEY: process.env.BREVO_API_KEY,
+  FONNTE_TOKEN: process.env.FONNTE_TOKEN,
 });
 
 if (!parsed.success) {
